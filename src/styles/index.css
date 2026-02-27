@@ -1,0 +1,71 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+:root {
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #0A0C14;
+  color: #FFFFFF;
+  font-family: var(--font-inter);
+  overflow-x: hidden;
+}
+
+/* Base floating card style */
+.floating-card {
+  @apply bg-background-card rounded-2xl shadow-floating transition-all duration-500 ease-in-out;
+}
+
+.floating-card:hover {
+  @apply shadow-lifted -translate-y-1;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(22, 27, 46, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Coca-Cola Accent Button */
+.btn-coke {
+  @apply bg-brand-coke text-white px-6 py-2 rounded-full font-medium transition-all duration-300 shadow-md;
+}
+
+.btn-coke:hover {
+  @apply brightness-110 shadow-lg -translate-y-0.5;
+}
+
+/* Animation utilities */
+.fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
