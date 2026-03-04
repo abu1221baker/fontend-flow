@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
-import api from '../api';
+import api, { API_BASE_URL } from '../api';
 import { useAuth } from './AuthContext';
 
 const ChatContext = createContext();
@@ -84,8 +84,8 @@ export const ChatProvider = ({ children }) => {
             if (user && currentRoom) {
                 console.log(`[ChatWS] Connecting to room ${currentRoom.id}`);
                 const token = localStorage.getItem('access_token');
-                const host = window.location.hostname;
-                const wsUrl = `ws://${host}:8000/ws/chat/${currentRoom.id}/?token=${token}`;
+                const wsBase = API_BASE_URL.replace(/^http/, 'ws');
+                const wsUrl = `${wsBase}/ws/chat/${currentRoom.id}/?token=${token}`;
 
                 socket = new WebSocket(wsUrl);
 

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
+import { API_BASE_URL } from '../api';
 import { useChat } from './ChatContext';
 import { useCallHistory } from './CallHistoryContext';
 
@@ -53,8 +54,8 @@ export const CallProvider = ({ children }) => {
             if (user) {
                 console.log(`[Signaling] Connecting to global signaling channel`);
                 const token = localStorage.getItem('access_token');
-                const host = window.location.hostname;
-                const wsUrl = `ws://${host}:8000/ws/call/global/?token=${token}`;
+                const wsBase = API_BASE_URL.replace(/^http/, 'ws');
+                const wsUrl = `${wsBase}/ws/call/global/?token=${token}`;
 
                 socket = new WebSocket(wsUrl);
 
