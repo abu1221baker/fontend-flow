@@ -85,11 +85,11 @@ export const Layout = ({ children }) => {
     };
 
     return (
-        <div className="flex h-screen bg-background-dark text-white overflow-hidden">
+        <div className="flex h-screen h-[100dvh] bg-background-dark text-white overflow-hidden relative">
             {/* Left Sidebar - Chat List & Search */}
-            <aside className="w-80 md:w-96 glass-dark border-r border-white/5 flex flex-col z-20">
+            <aside className={`w-full md:w-80 lg:w-96 glass-dark border-r border-white/5 flex flex-col z-20 transition-all duration-300 ${currentRoom && !isHistoryPage ? 'hidden md:flex' : 'flex'}`}>
                 {/* Sidebar Header */}
-                <div className="p-4 h-16 flex items-center justify-between border-b border-white/5 bg-background-dark/40">
+                <div className="p-4 h-16 flex-shrink-0 flex items-center justify-between border-b border-white/5 bg-background-dark/40 sticky top-0 z-30">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-2xl border border-white/10 overflow-hidden shadow-floating bg-background-card">
                             {user?.avatar ? (
@@ -140,7 +140,7 @@ export const Layout = ({ children }) => {
                 </div>
 
                 {/* Sidebar Search Area */}
-                <div className="p-4">
+                <div className="p-4 flex-shrink-0 sticky top-16 z-20 bg-background-dark/80 backdrop-blur-sm">
                     <div className="relative group">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-brand-coke transition-colors" size={16} />
                         <input
@@ -235,15 +235,21 @@ export const Layout = ({ children }) => {
             </aside>
 
             {/* Main Content Area - Message View or Call History */}
-            <main className="flex-1 flex flex-col overflow-hidden relative bg-background-dark">
+            <main className={`flex-1 flex flex-col overflow-hidden relative bg-background-dark transition-all duration-300 ${!currentRoom && !isHistoryPage && !children ? 'hidden md:flex' : 'flex'}`}>
                 {children ? (
                     children
                 ) : currentRoom ? (
                     <>
                         {/* Chat Header */}
-                        <header className="h-16 flex items-center justify-between px-6 bg-background-dark/40 backdrop-blur-md z-10 border-b border-white/5">
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-2xl border border-white/10 overflow-hidden shadow-floating bg-background-card">
+                        <header className="h-16 flex-shrink-0 flex items-center justify-between px-4 md:px-6 bg-background-dark/40 backdrop-blur-md z-10 border-b border-white/5 sticky top-0">
+                            <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
+                                <button
+                                    onClick={() => selectRoom(null)}
+                                    className="md:hidden p-2 -ml-2 text-white/40 hover:text-white transition-colors"
+                                >
+                                    <ArrowLeft size={20} />
+                                </button>
+                                <div className="w-10 h-10 rounded-2xl border border-white/10 overflow-hidden shadow-floating bg-background-card flex-shrink-0">
                                     {(() => {
                                         const otherUser = currentRoom.participants?.find(p => p.id !== user?.id);
                                         return otherUser?.avatar ? (
@@ -253,8 +259,8 @@ export const Layout = ({ children }) => {
                                         );
                                     })()}
                                 </div>
-                                <div>
-                                    <h1 className="text-sm font-bold text-white/90">
+                                <div className="min-w-0">
+                                    <h1 className="text-sm font-bold text-white/90 truncate">
                                         {currentRoom.name || currentRoom.participants?.filter(p => p.id !== user?.id).map(p => p.first_name || p.email.split('@')[0]).join(', ') || 'Chat'}
                                     </h1>
                                     <div className="flex items-center gap-1.5">
@@ -263,7 +269,7 @@ export const Layout = ({ children }) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 md:gap-4">
                                 <button
                                     onClick={() => {
                                         const otherUser = currentRoom.participants?.find(p => p.id !== user?.id);
@@ -273,7 +279,7 @@ export const Layout = ({ children }) => {
                                 >
                                     <Phone size={20} />
                                 </button>
-                                <button className="p-2.5 text-white/30 hover:text-white transition-all rounded-xl hover:bg-white/5 active:scale-90">
+                                <button className="p-2.5 text-white/30 hover:text-white transition-all rounded-xl hover:bg-white/5 active:scale-90 hidden sm:block">
                                     <Grid size={20} />
                                 </button>
                             </div>
@@ -281,7 +287,7 @@ export const Layout = ({ children }) => {
 
                         {/* Messages Area */}
 
-                        <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar relative z-0">
+                        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 md:space-y-8 custom-scrollbar relative z-0">
                             {(() => {
                                 // Merge and sort messages and call logs
                                 const combined = [
@@ -292,7 +298,7 @@ export const Layout = ({ children }) => {
                                 if (combined.length === 0) {
                                     return (
                                         <div className="h-full flex flex-col items-center justify-center opacity-20 select-none">
-                                            <div className="w-20 h-20 bg-white/5 border border-white/10 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                                            <div className="w-16 h-16 md:w-20 md:h-20 bg-white/5 border border-white/10 rounded-full flex items-center justify-center mb-6 shadow-inner">
                                                 <ShieldCheck size={32} className="text-white/20" />
                                             </div>
                                             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/20">End-to-End Encrypted</p>
@@ -305,13 +311,13 @@ export const Layout = ({ children }) => {
                                         const isMe = item.sender === user?.id;
                                         return (
                                             <div key={`msg-${item.id || idx}`} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
-                                                <div className={`flex flex-col gap-1.5 max-w-[75%] ${isMe ? 'items-end' : 'items-start'}`}>
+                                                <div className={`flex flex-col gap-1.5 max-w-[85%] md:max-w-[75%] ${isMe ? 'items-end' : 'items-start'}`}>
                                                     {!isMe && (
                                                         <span className="text-[10px] font-bold uppercase tracking-widest text-white/30 ml-3 mb-0.5">
                                                             {item.sender_email?.split('@')[0]}
                                                         </span>
                                                     )}
-                                                    <div className={`px-5 py-3 rounded-2xl shadow-floating text-[13px] leading-relaxed font-medium relative
+                                                    <div className={`px-4 py-2.5 md:px-5 md:py-3 rounded-2xl shadow-floating text-[13px] leading-relaxed font-medium relative
                                                         ${isMe
                                                             ? 'bg-brand-coke text-white rounded-tr-none pb-5'
                                                             : 'bg-background-card/80 glass-light text-white/90 rounded-tl-none border border-white/5 pb-5'}`}
@@ -323,13 +329,13 @@ export const Layout = ({ children }) => {
                                                                         key={att.id}
                                                                         src={att.file.startsWith('http') ? att.file : `${API_BASE_URL.replace(/\/$/, '')}${att.file.startsWith('/') ? '' : '/'}${att.file.replace(/^\//, '')}`}
                                                                         alt="Shared Image"
-                                                                        className="max-w-full max-h-[300px] object-contain hover:scale-105 transition-transform duration-500 cursor-pointer"
+                                                                        className="max-w-full max-h-[250px] md:max-h-[300px] object-contain hover:scale-105 transition-transform duration-500 cursor-pointer"
                                                                         onClick={() => window.open(att.file.startsWith('http') ? att.file : `${API_BASE_URL.replace(/\/$/, '')}${att.file.startsWith('/') ? '' : '/'}${att.file.replace(/^\//, '')}`, '_blank')}
                                                                     />
                                                                 ))}
                                                             </div>
                                                         )}
-                                                        {item.content && <p>{item.content}</p>}
+                                                        {item.content && <p className="break-words">{item.content}</p>}
                                                         <div className={`absolute bottom-1.5 right-3 flex items-center gap-1.5 whitespace-nowrap`}>
                                                             <span className="text-[8px] font-bold text-white/40 uppercase tracking-tighter">
                                                                 {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -354,7 +360,7 @@ export const Layout = ({ children }) => {
                                         const isMissed = item.status === 'missed';
                                         return (
                                             <div key={`call-${item.id || idx}`} className="flex justify-center animate-in zoom-in duration-700">
-                                                <div className="bg-white/5 border border-white/5 rounded-2xl px-6 py-3 flex items-center gap-4 shadow-floating backdrop-blur-sm">
+                                                <div className="bg-white/5 border border-white/5 rounded-2xl px-4 py-2 md:px-6 md:py-3 flex items-center gap-3 md:gap-4 shadow-floating backdrop-blur-sm">
                                                     <div className={`p-2 rounded-xl ${isMissed ? 'bg-brand-coke/20 text-brand-coke' : 'bg-white/5 text-white/40'}`}>
                                                         {item.call_type === 'video' ? <Video size={16} /> : <Phone size={16} />}
                                                     </div>
@@ -378,8 +384,8 @@ export const Layout = ({ children }) => {
                         </div>
 
                         {/* Input Area */}
-                        <div className="p-6 bg-background-dark/40 backdrop-blur-md border-t border-white/5">
-                            <form onSubmit={handleSend} className="relative group max-w-4xl mx-auto">
+                        <div className="p-4 md:p-6 bg-background-dark/40 backdrop-blur-md border-t border-white/5 flex-shrink-0 sticky bottom-0">
+                            <form onSubmit={handleSend} className="relative group max-w-4xl mx-auto flex items-center gap-2">
                                 <input
                                     type="file"
                                     ref={fileInputRef}
@@ -387,47 +393,49 @@ export const Layout = ({ children }) => {
                                     accept="image/*"
                                     className="hidden"
                                 />
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                                <div className="flex-1 relative">
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            disabled={isUploading}
+                                            className="text-white/20 hover:text-brand-coke transition-colors disabled:opacity-50"
+                                        >
+                                            {isUploading ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
+                                        </button>
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="Write a message..."
+                                        className="w-full bg-background-dark/80 border border-white/10 rounded-2xl py-3.5 md:py-4 pl-12 pr-12 text-[13px] focus:outline-none focus:border-brand-coke/50 focus:ring-1 focus:ring-brand-coke/20 transition-all shadow-inner font-medium placeholder:text-white/20"
+                                        value={inputText}
+                                        onChange={(e) => setInputText(e.target.value)}
+                                    />
                                     <button
-                                        type="button"
-                                        onClick={() => fileInputRef.current?.click()}
-                                        disabled={isUploading}
-                                        className="text-white/20 hover:text-brand-coke transition-colors disabled:opacity-50"
+                                        type="submit"
+                                        disabled={!inputText.trim()}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-brand-coke p-2 md:p-2.5 rounded-xl text-white shadow-glow hover:scale-105 active:scale-95 transition-all disabled:opacity-0 disabled:scale-90"
                                     >
-                                        {isUploading ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
+                                        <Share2 size={18} className="rotate-90 translate-x-0.5" />
                                     </button>
                                 </div>
-                                <input
-                                    type="text"
-                                    placeholder="Write a secure message..."
-                                    className="w-full bg-background-dark/80 border border-white/10 rounded-2xl py-4 pl-12 pr-14 text-[13px] focus:outline-none focus:border-brand-coke/50 focus:ring-1 focus:ring-brand-coke/20 transition-all shadow-inner font-medium placeholder:text-white/20"
-                                    value={inputText}
-                                    onChange={(e) => setInputText(e.target.value)}
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={!inputText.trim()}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-brand-coke p-2.5 rounded-xl text-white shadow-glow hover:scale-105 active:scale-95 transition-all disabled:opacity-0 disabled:scale-90"
-                                >
-                                    <Share2 size={18} className="rotate-90 translate-x-0.5" />
-                                </button>
                             </form>
                         </div>
                     </>
                 ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center p-12 text-center animate-in fade-in duration-1000">
-                        <div className="w-32 h-32 bg-brand-coke/10 rounded-full flex items-center justify-center mb-8 relative">
+                    <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 text-center animate-in fade-in duration-1000">
+                        <div className="w-24 h-24 md:w-32 md:h-32 bg-brand-coke/10 rounded-full flex items-center justify-center mb-8 relative">
                             <div className="absolute inset-0 bg-brand-coke/20 rounded-full animate-ping" />
-                            <Video className="text-brand-coke relative z-10" size={48} />
+                            <Video className="text-brand-coke relative z-10" size={36} />
                         </div>
-                        <h2 className="text-4xl font-black tracking-tighter mb-4 text-brand-coke italic">flow</h2>
-                        <h3 className="text-xl font-bold tracking-tight mb-4">Seamless Connections</h3>
-                        <p className="text-[13px] text-white/40 max-w-sm font-medium leading-relaxed">
+                        <h2 className="text-3xl md:text-4xl font-black tracking-tighter mb-4 text-brand-coke italic">flow</h2>
+                        <h3 className="text-lg md:text-xl font-bold tracking-tight mb-4">Seamless Connections</h3>
+                        <p className="text-[12px] md:text-[13px] text-white/40 max-w-[280px] md:max-w-sm font-medium leading-relaxed">
                             Experience the next level of private messaging. Select a conversation from the sidebar or start a new flow with your friends.
                         </p>
-                        <div className="mt-12 flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-white/10">
+                        <div className="mt-8 md:mt-12 flex flex-wrap justify-center items-center gap-4 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/10">
                             <div className="flex items-center gap-1.5"><Monitor size={14} /> Desktop Flow</div>
-                            <div className="w-1 h-1 rounded-full bg-white/10" />
+                            <div className="hidden sm:block w-1 h-1 rounded-full bg-white/10" />
                             <div className="flex items-center gap-1.5"><Users size={14} /> Group Flow</div>
                         </div>
                     </div>
